@@ -33,3 +33,13 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/flask-ml-app:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+        #SonarQube Scand
+      - name: SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=my-project \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.login=$SONAR_TOKEN
