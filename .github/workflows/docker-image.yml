@@ -1,0 +1,43 @@
+name: Docker Image CI
+
+on:
+push:
+branches: [ "main" ]
+pull_request:
+branches: [ "main" ]
+
+jobs:
+build:
+runs-on: ubuntu-latest
+
+```
+steps:
+  # 1. Checkout code
+  - name: Checkout code
+    uses: actions/checkout@v4
+
+  # 2. Set up Docker
+  - name: Set up Docker
+    uses: docker/setup-buildx-action@v3
+
+  # 3. Login to Docker Hub
+  - name: Login to Docker Hub
+    run: |
+      echo "${{ secrets.DOCKER_PASSWORD }}" | docker login \
+        -u "${{ secrets.DOCKER_USERNAME }}" \
+        --password-stdin
+
+  # 4. Build Docker image
+  - name: Build Docker image
+    run: |
+      docker build \
+        -t "${{ secrets.DOCKER_USERNAME }}/flask-ml-app:latest" \
+        -t "${{ secrets.DOCKER_USERNAME }}/flask-ml-app:${{ github.sha }}" \
+        .
+
+  # 5. Push Docker image
+  - name: Push Docker image
+    run: |
+      docker push "${{ secrets.DOCKER_USERNAME }}/flask-ml-app:latest"
+      docker push "${{ secrets.DOCKER_USERNAME }}/flask-ml-app:${{ github.sha }}"
+```
